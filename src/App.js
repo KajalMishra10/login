@@ -7,11 +7,20 @@ export default function App() {
   const [show, setShow] = useState(false);
   const [fom, setFom] = useState(true);
   const [error, setError] = useState(false);
+  const [maskedPassword, setMaskedPassword] = useState("");
+
+  const handlePasswordChange = (event) => {
+    const value = event.target.value;
+    setLast((p) => p + value[value.length - 1]);
+    // Masking the password with asterisks
+    setMaskedPassword("*".repeat(value.length));
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log("hi");
     //setData();
+    console.log(last);
     if (first == "user" && last == "password") {
       setShow(true);
       setFom(false);
@@ -46,7 +55,8 @@ export default function App() {
               type="text"
               required
               placeholder="password"
-              onChange={(e) => setLast(e.target.value)}
+              value={maskedPassword}
+              onChange={handlePasswordChange}
             />
           </label>
           <button>Submit</button>
