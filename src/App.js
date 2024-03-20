@@ -1,55 +1,50 @@
 import "./styles.css";
-import { useEffect } from "react";
 import { useState } from "react";
+import { useEffect } from "react";
 
 export default function App() {
-  const [data, setData] = useState([]);
+  const [iniData, setIniData] = useState([]);
+  const [meaning, setMeaning] = useState("");
 
-  const data2 = [
-    { date: "2022-09-01", views: 100, article: "Article 1" },
-    { date: "2023-09-01", views: 100, article: "Article 1" },
-    { date: "2023-09-02", views: 150, article: "Article 2" },
-    { date: "2023-09-02", views: 120, article: "Article 3" },
-    { date: "2020-09-03", views: 200, article: "Article 4" },
+  const data = [
+    {
+      word: "React",
+      meaning: "A JavaScript library for building user interfaces.",
+    },
+    { word: "Component", meaning: "A reusable building block in React." },
+    { word: "State", meaning: "An object that stores data for a component." },
   ];
 
+  const findWord = (word) => {
+    let meaning = "";
+    iniData.forEach((w) => {
+      if (w.word.toLowerCase() === word) {
+        meaning = w.meaning;
+      }
+    });
+
+    if (meaning === "") {
+      meaning = "Word not found in the dictionary.";
+    }
+    setMeaning(meaning);
+  };
+
   useEffect(() => {
-    setData(data2);
+    setIniData(data);
   }, []);
-
-  const sortByDate = () => {
-    data2.sort((a, b) => new Date(b.date) - new Date(a.date));
-    setData(data2);
-  };
-
-  const sortByViews = () => {
-    data2.sort((a, b) => b.views - a.views);
-    setData(data2);
-  };
-
   return (
     <div>
-      <h1>Date and Views Table</h1>
-      <button onClick={sortByDate}>Sort by Date</button>
-      <button onClick={sortByViews}>Sort by Views</button>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Views</th>
-            <th>Article</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td>{item.date}</td>
-              <td>{item.views}</td>
-              <td>{item.article}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h1>Dictionary App</h1>
+      <form
+        onSubmit={(e) => (
+          e.preventDefault(), findWord(e.target.word.value.toLowerCase())
+        )}
+      >
+        <input name="word" type="text" placeholder="Search for a word" />
+        <button type="submit">Search</button>
+      </form>
+      <div style={{ fontWeight: "bold" }}>Definition:</div>
+      <div style={{ marginTop: "20px", marginBottom: "20px" }}>{meaning}</div>
     </div>
   );
 }
