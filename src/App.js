@@ -1,129 +1,55 @@
 import "./styles.css";
-import React, { useState, useEffect, useRef } from "react";
-    
-        
-       
-const App = () => {
-  const [formVisible, setFormVisible] = useState(false);
-  const [formValid, setFormValid] = useState(true);
-  const [inpData, setInpData] = useState({
-    username: "",
-    email: "",
-    phone: "",
-    dob: "",
-  });
-  const modalRef = useRef(null);
+import { useEffect } from "react";
+import { useState } from "react";
+
+export default function App() {
+  const [data, setData] = useState([]);
+
+  const data2 = [
+    { date: "2022-09-01", views: 100, article: "Article 1" },
+    { date: "2023-09-01", views: 100, article: "Article 1" },
+    { date: "2023-09-02", views: 150, article: "Article 2" },
+    { date: "2023-09-02", views: 120, article: "Article 3" },
+    { date: "2020-09-03", views: 200, article: "Article 4" },
+  ];
 
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setFormVisible(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
+    setData(data2);
   }, []);
-  const openForm = () => {
-    setFormVisible(true);
+
+  const sortByDate = () => {
+    data2.sort((a, b) => new Date(b.date) - new Date(a.date));
+    setData(data2);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(inpData.phone)) {
-      alert("Invalid phone number. Please enter a valid 10-digit phone number");
-      return;
-    }
-
-    const currentDate = new Date();
-    const selectedDate = new Date(inpData.dob);
-    if (selectedDate >= currentDate) {
-      alert("Invalid date of birth. Date of birth cannot be in the future.");
-      return;
-    }
-
-    setInpData({
-      username: "",
-      email: "",
-      phone: "",
-      dob: "",
-    });
+  const sortByViews = () => {
+    data2.sort((a, b) => b.views - a.views);
+    setData(data2);
   };
 
   return (
-    <div
-      className="background"
-      style={{ backgroundColor: `${formVisible ? "#7f7f7f" : "#fff"}` }}
-    >
-      <div className={`${formVisible ? "disabled" : ""}`}>
-        <h1>User Details Modal</h1>
-        <button onClick={openForm}>Open Form</button>
-      </div>
-
-      {formVisible && (
-        <div ref={modalRef} className="modal">
-          <div className="modal-content">
-            <form onSubmit={handleSubmit}>
-              <h2>Fill Details</h2>
-              <label htmlFor="username">Username:</label>
-              <input
-                type="text"
-                name="username"
-                id="username"
-                value={inpData.username}
-                onChange={(e) => {
-                  setInpData({ ...inpData, username: e.target.value });
-                }}
-                required
-              />
-              <label htmlFor="email">Email Address:</label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                value={inpData.email}
-                onChange={(e) => {
-                  setInpData({ ...inpData, email: e.target.value });
-                }}
-                required
-              />
-              <label htmlFor="phone">Phone Number:</label>
-              <input
-                type="text"
-                name="phone"
-                id="phone"
-                value={inpData.phone}
-                onChange={(e) => {
-                  setInpData({ ...inpData, phone: e.target.value });
-                }}
-                required
-              />
-              <label htmlFor="dob">Date of Birth:</label>
-              <input
-                type="date"
-                name="dob"
-                id="dob"
-                value={inpData.dob}
-                onChange={(e) => {
-                  setInpData({ ...inpData, dob: e.target.value });
-                }}
-                required
-              />
-
-              <button className="submit-button" type="submit">
-                Submit
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+    <div>
+      <h1>Date and Views Table</h1>
+      <button onClick={sortByDate}>Sort by Date</button>
+      <button onClick={sortByViews}>Sort by Views</button>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Views</th>
+            <th>Article</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item, index) => (
+            <tr key={index}>
+              <td>{item.date}</td>
+              <td>{item.views}</td>
+              <td>{item.article}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-};
-
-export default App;
-
+}
