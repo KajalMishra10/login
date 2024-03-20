@@ -1,67 +1,61 @@
 import "./styles.css";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
-export default function App() {
-  const [first, setFirst] = useState("");
-  const [last, setLast] = useState("");
-  const [show, setShow] = useState(false);
-  const [fom, setFom] = useState(true);
-  const [error, setError] = useState(false);
-  const [maskedPassword, setMaskedPassword] = useState("");
+function App() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [flag, setFlag] = useState(0);
 
-  const handlePasswordChange = (event) => {
-    const value = event.target.value;
-    setLast((p) => p + value[value.length - 1]);
-    // Masking the password with asterisks
-    setMaskedPassword("*".repeat(value.length));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    username === "user" && password === "password" ? setFlag(1) : setFlag(2);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("hi");
-    //setData();
-    console.log(last);
-    if (first == "user" && last == "password") {
-      setShow(true);
-      setFom(false);
-      setError(false);
-    } else if (first != "user" || last != "password") {
-      setError(true);
-      setFom(true);
-      setShow(false);
-    } else {
-      setFom(true);
-    }
-  };
   return (
     <div className="App">
       <h1>Login Page</h1>
-      {show && <div>Welcome, user!</div>}
-      {error && <div>Invaild username or password</div>}
-      {fom && (
-        <form onSubmit={handleSubmit}>
-          <label>
-            Username:
+      {flag === 0 ? (
+        <form onSubmit={(e) => handleSubmit(e)}>
+          <div>
+            <label htmlFor="username" name="username">
+              Username
+            </label>
             <input
               type="text"
+              name="username"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
               required
-              placeholder="username"
-              onChange={(e) => setFirst(e.target.value)}
             />
-          </label>
-          <label>
-            Password:
+          </div>
+          <div>
+            <label htmlFor="password" name="password">
+              Password
+            </label>
             <input
-              type="text"
+              type="password"
+              name="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
               required
-              placeholder="password"
-              value={maskedPassword}
-              onChange={handlePasswordChange}
             />
-          </label>
-          <button>Submit</button>
+          </div>
+
+          <button type="submit" name="login">
+            Submit
+          </button>
         </form>
+      ) : flag === 1 ? (
+        "Welcome, user!"
+      ) : (
+        "Invalid username or password"
       )}
     </div>
   );
 }
+
+export default App;
