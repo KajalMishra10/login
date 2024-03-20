@@ -1,68 +1,97 @@
 import "./styles.css";
-import "./styles.css";
 import { useState } from "react";
 import { useEffect } from "react";
 
 export default function App() {
-  const [country, setCountry] = useState([]);
-  const [input, setInput] = useState("");
-  const [filtedata, setfilterData] = useState([]);
+  const [totalData, setTotalData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage] = useState(10);
+  const [currentD, setCurrentD] = useState([]);
+  useEffect(() => {
+    getData();
+  }, []);
 
   useEffect(() => {
-    data();
-  }, []);
-  function data() {
-    fetch("https://restcountries.com/v3.1/all")
-      .then((res) => res.json())
-      .then((data1) => {
-        setCountry(data1);
-        setfilterData(data1);
-      })
-      .catch((error) => console.error("Error fetchind data:", error));
-  }
+    currentData();
+  }, [currentPage, totalData]);
 
-  let find = () => {
-    let data = country.filter((country) => {
-      let val = country.name.common.toLowerCase();
-      if (val.includes(input.toLowerCase())) {
-        return true;
-      } else {
-        return false;
-      }
+  const currentData = () => {
+    const lastData = currentPage * recordsPerPage;
+    const firstData = lastData - recordsPerPage;
+    const sliced = totalData.slice(firstData, lastData);
+    setCurrentD(() => {
+      return sliced;
     });
-
-    setfilterData(data);
   };
 
-  useEffect(() => {
-    find();
-  }, [input]);
+  async function getData() {
+    try {
+      const response = await fetch(
+        "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json"
+      );
+      const data = await response.json();
+      setTotalData(data);
+    } catch (error) {
+      alert("failed to fetch data");
+    }
+  }
 
   return (
-    <div>
-      <div className="search">
-        <input
-          onChange={(e) => {
-            let val = e.target.value;
-            setInput(val);
+    <div className="container">
+      <h1>Employee Data Table</h1>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentD.map((data) => (
+            <tr key={data.id}>
+              <td>{data.id}</td>
+              <td>{data.name}</td>
+              <td>{data.email}</td>
+              <td>{data.role}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="buttonCon">
+        <button
+          className="buttonPN"
+          onClick={() => {
+            setCurrentPage((prev) => {
+              if (prev === 1) {
+                return prev;
+              } else {
+                return prev - 1;
+              }
+            });
+            currentData();
           }}
-          placeholder="Search for countries"
-          className="searchinput"
-          type="text"
-        />
-      </div>
-
-      <div className="fullCon">
-        {filtedata.map((country) => (
-          <div className="countryCard" key={country.car.ccn3}>
-            <img
-              className="imageConatiner"
-              src={country.flags.png}
-              alt={country.flags.alt}
-            />
-            <div className="text">{country.name.common}</div>
-          </div>
-        ))}
+        >
+          Previous
+        </button>
+        <button className="number">{currentPage}</button>
+        <button
+          className="buttonPN"
+          onClick={() => {
+            const final = Math.floor(totalData.length / recordsPerPage) + 1;
+            setCurrentPage((prev) => {
+              if (prev === final) {
+                return prev;
+              } else {
+                return prev + 1;
+              }
+            });
+            currentData();
+          }}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
