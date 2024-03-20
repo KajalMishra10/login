@@ -1,59 +1,64 @@
 import "./styles.css";
-import { useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [flag, setFlag] = useState(0);
+  const [countries, setCountries] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [search, setSearch] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    username === "user" && password === "password" ? setFlag(1) : setFlag(2);
+  const handleChange = (e) => {
+    setSearch(e.target.value);
   };
 
-  return (
-    <div className="App">
-      <h1>Login Page</h1>
-      {flag === 0 ? (
-        <form onSubmit={(e) => handleSubmit(e)}>
-          <div>
-            <label htmlFor="username" name="username">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" name="password">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-              required
-            />
-          </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resp = await fetch("https://restcountries.com/v3.1/all");
+        const data = await resp.json();
+        setCountries(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, []);
 
-          <button type="submit" name="login">
-            Submit
-          </button>
-        </form>
-      ) : flag === 1 ? (
-        "Welcome, user!"
-      ) : (
-        "Invalid username or password"
-      )}
+  useEffect(() => {
+    const data = countries.filter((country) =>
+      country.name.common.toLowerCase().includes(search.toLowerCase())
+    );
+    setFiltered(data);
+  }, [search]);
+
+  console.log(countries);
+  return (
+    <div>
+      <div className="inp">
+        <input
+          type="text"
+          placeholder="Enter a country"
+          onChange={(e) => handleChange(e)}
+        />
+      </div>
+      <div className="App">
+        {search === ""
+          ? countries.map((country) => {
+              return (
+                <div className="countryCard">
+                  <img src={country.flags.png} alt={country.flag}></img>
+                  <h3>{country.name.common}</h3>
+                </div>
+              );
+            })
+          : filtered.map((country) => {
+              return (
+                <div className="countryCard">
+                  <img src={country.flags.png} alt={country.flag}></img>
+                  <h3>{country.name.common}</h3>
+                </div>
+              );
+            })}
+      </div>
     </div>
   );
 }
